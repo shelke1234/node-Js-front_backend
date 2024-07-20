@@ -46,7 +46,7 @@ pipeline {
 
                     
                     // Login to ECR
-                    sh "docker login --username AWS --password-stdin ${ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com <<< ${ecrLogin}"
+                    sh "docker login --username AWS --password-stdin ${env.ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com"
                     echo 'login done'
                 }
             }
@@ -58,7 +58,7 @@ pipeline {
                 sh "docker tag ${ECR_REPO_NAME}:${IMAGE_TAG} ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/${ECR_REPO_NAME}:${IMAGE_TAG}"
                 
                 // Push Docker image to ECR
-                sh "docker push ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/${ECR_REPO_NAME}:${IMAGE_TAG}"
+                sh "docker push ${ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/${ECR_REPO_NAME}:${IMAGE_TAG}"
             }
         }
 
