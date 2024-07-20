@@ -43,7 +43,10 @@ pipeline {
         
         stage('Deploy') {
             steps {
-                sh "docker-compose down && docker-compose up -d"
+                sh """
+                    docker-compose --env-file docker-compose.env down
+                    docker-compose --env-file docker-compose.env up -d
+                """
                 echo "App Deployed Successfully"
             }
         }
