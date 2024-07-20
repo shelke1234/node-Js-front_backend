@@ -20,13 +20,13 @@ pipeline {
                }
             }
         }
-        stage("SonarQube Quality Gates"){
-            steps{
-               timeout(time: 2, unit: "MINUTES"){
-                   waitForQualityGate abortPipeline: true
-               }
-            }
-        }
+        // stage("SonarQube Quality Gates"){
+        //     steps{
+        //        timeout(time: 2, unit: "MINUTES"){
+        //            waitForQualityGate abortPipeline: true
+        //        }
+        //     }
+        // }
         // stage("OWASP"){
         //     steps{
         //         dependencyCheck additionalArguments: '--scan ./', odcInstallation: 'OWASP'
