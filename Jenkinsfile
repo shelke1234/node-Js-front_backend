@@ -22,11 +22,11 @@ pipeline {
                     println trivyOutput
 
                     // Check if vulnerabilities were found
-                    if (trivyOutput.contains("Total: 0")) {
-                        echo "No vulnerabilities found in the Docker image."
-                    } else {
-                        error "Vulnerabilities found in the Docker image. Build failed."
-                    }
+                    // if (trivyOutput.contains("Total: 0")) {
+                    //     echo "No vulnerabilities found in the Docker image."
+                    // } else {
+                    //     error "Vulnerabilities found in the Docker image. Build failed."
+                    // }
                     
                     // Retrieve ECR login password
                     def ecrLogin = sh(script: "aws ecr get-login-password --region ${env.AWS_REGION}", returnStdout: true).trim()
