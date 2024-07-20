@@ -9,7 +9,7 @@ pipeline {
         
         stage("Code"){
             steps{
-                git url: "https://github.com/shelke1234/node-Js-front_backend.git" , branch: "Dhananjay"
+                git url: "https://github.com/shelke1234/dotnet-banking-app.git" , branch: "master"
                 echo "Code Cloned Successfully"
             }
         }
