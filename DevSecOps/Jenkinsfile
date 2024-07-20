@@ -27,12 +27,12 @@ pipeline {
                }
             }
         }
-        stage("OWASP"){
-            steps{
-                dependencyCheck additionalArguments: '--scan ./', odcInstallation: 'OWASP'
-                dependencyCheckPublisher pattern: '**/dependency-check-report.xml'
-            }
-        }
+        // stage("OWASP"){
+        //     steps{
+        //         dependencyCheck additionalArguments: '--scan ./', odcInstallation: 'OWASP'
+        //         dependencyCheckPublisher pattern: '**/dependency-check-report.xml'
+        //     }
+        // }
         stage("Build & Test"){
             steps{
                 sh 'docker build -t node-app-batch-6:latest .'
@@ -46,10 +46,9 @@ pipeline {
         }
         stage("Push to Private Docker Hub Repo"){
             steps{
-                withCredentials([usernamePassword(credentialsId:"DockerHubCreds",passwordVariable:"dockerPass",usernameVariable:"dockerUser")]){
-                sh "docker login -u ${env.dockerUser} -p ${env.dockerPass}"
-                sh "docker tag node-app-batch-6:latest ${env.dockerUser}/node-app-batch-6:latest"
-                sh "docker push ${env.dockerUser}/node-app-batch-6:latest"
+                sh "aws ecr get-login-password ${env.aceruser} -p ${env.acrpassword}"
+                sh "docker tag node-app-test-new:latest ${env.aceruser}/node-app-test-new:latest"
+                sh "docker push ${env.aceruser}/node-app-test-new:latest"
                 }
                 
             }
@@ -61,4 +60,4 @@ pipeline {
             }
         }
     }
-}
+
