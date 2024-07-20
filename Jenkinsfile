@@ -1,66 +1,69 @@
-
 pipeline {
-    
     agent any
-    environment{
+    
+    environment {
         SONAR_HOME = tool "Sonar"
+        AWS_REGION = 'ap-south-1' // Set your AWS region
+        ECR_REPO_NAME = 'devopsprojectpratices' // Set your ECR repository name
+        IMAGE_TAG = "${env.BUILD_ID}" // Use the build ID as the image tag
+        DOCKER_IMAGE = "${ECR_REPO_NAME}:${IMAGE_TAG}"
+        AWS_ACCOUNT_ID = credentials('awslogin') // Assuming you've stored your AWS account ID as a Jenkins credential
+        AWS_ACCESS_KEY_ID = credentials('awslogin')
+        AWS_SECRET_ACCESS_KEY = credentials('awslogin')
     }
+    
     stages {
-        
         stage("Code"){
             steps{
-                git url: "https://github.com/shelke1234/node-Js-front_backend.git" , branch: "Dhananjay"
+                git url: "https://github.com/shelke1234/node-Js-front_backend.git", branch: "Dhananjay"
                 echo "Code Cloned Successfully"
             }
         }
+        
         stage("SonarQube Analysis"){
             steps{
-               withSonarQubeEnv("Sonar"){
-                   sh "$SONAR_HOME/bin/sonar-scanner -Dsonar.projectName=node-Js-front_backend -Dsonar.projectKey=node-Js-front_backend -X"
-               }
-            }
-        }
-        // stage("SonarQube Quality Gates"){
-        //     steps{
-        //        timeout(time: 2, unit: "MINUTES"){
-        //            waitForQualityGate abortPipeline: true
-        //        }
-        //     }
-        // }
-        // stage("OWASP"){
-        //     steps{
-        //         dependencyCheck additionalArguments: '--scan ./', odcInstallation: 'OWASP'
-        //         dependencyCheckPublisher pattern: '**/dependency-check-report.xml'
-        //     }
-        // }
-        stage("Build & Test"){
-            steps{
-                sh 'docker build -t node-app-test-new .'
-                echo "Code Built Successfully"
-            }
-        }
-        // stage("Trivy"){
-        //     steps{
-        //         sh "trivy image node-app-batch-6"
-        //     }
-        // }
-        stage("Push to Private Docker Hub Repo"){
-            steps{
-                sh "aws ecr get-login-password ${env.aceruser} -p ${env.acrpassword}"
-                sh "docker tag node-app-test-new:latest ${env.aceruser}/node-app-test-new:latest"
-                sh "docker build -t node-app-test-new ."
-                sh "docker tag node-app-test-new:latest 449368362816.dkr.ecr.ap-south-1.amazonaws.com/devopsprojectpratices:latest"
-                sh "docker push 449368362816.dkr.ecr.ap-south-1.amazonaws.com/node-app-test-new:latest"
-                sh "docker push ${env.aceruser}/node-app-test-new:latest"
+                withSonarQubeEnv("Sonar"){
+                    sh "$SONAR_HOME/bin/sonar-scanner -Dsonar.projectName=node-Js-front_backend -Dsonar.projectKey=node-Js-front_backend -X"
                 }
-                
             }
+        }
+        
+        stage('Build Docker Image') {
+            steps {
+                script {
+                    // Build Docker image from Dockerfile
+                    dockerImage = docker.build("${ECR_REPO_NAME}:${IMAGE_TAG}", "./")
+                }
+            }
+        }
+        
+        stage('Login to ECR') {
+            steps {
+                script {
+                    // Retrieve ECR login password
+                    def ecrLogin = sh(script: "aws ecr get-login-password --region ${AWS_REGION}", returnStdout: true).trim()
+                    
+                    // Login to ECR
+                    sh "docker login --username AWS --password-stdin ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com <<< ${ecrLogin}"
+                }
+            }
+        }
+        
+        stage("Push to ECR repo"){
+            steps{
+                // Tag the Docker image with ECR repository URL
+                sh "docker tag ${ECR_REPO_NAME}:${IMAGE_TAG} ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/${ECR_REPO_NAME}:${IMAGE_TAG}"
+                
+                // Push Docker image to ECR
+                sh "docker push ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/${ECR_REPO_NAME}:${IMAGE_TAG}"
+            }
+        }
 
-        // stage("Deploy"){
-        //     steps{
-        //         sh "docker-compose down && docker-compose up -d"
-        //         echo "App Deployed Successfully"
-        //     }
-        // }
+        stage("Deploy"){
+            steps{
+                sh "docker-compose down && docker-compose up -d"
+                echo "App Deployed Successfully"
+            }
+        }
     }
 }
