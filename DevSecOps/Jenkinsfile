@@ -9,14 +9,14 @@ pipeline {
         
         stage("Code"){
             steps{
-                git url: "https://github.com/shelke1234/dotnet-banking-app.git" , branch: "master"
+                git url: "https://github.com/cr0hn/vulnerable-node.git" , branch: "master"
                 echo "Code Cloned Successfully"
             }
         }
         stage("SonarQube Analysis"){
             steps{
                withSonarQubeEnv("Sonar"){
-                   sh "$SONAR_HOME/bin/sonar-scanner -Dsonar.projectName=node-Js-front_backend -Dsonar.projectKey=node-Js-front_backend -X"
+                   sh "$SONAR_HOME/bin/sonar-scanner -Dsonar.projectName=vulnerable-node -Dsonar.projectKey=vulnerable-node -X"
                }
             }
         }
