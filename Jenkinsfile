@@ -3,7 +3,7 @@ pipeline {
     
     environment {
         AWS_REGION = 'ap-south-1'  // Set your AWS region
-        ECR_REPO_NAME = 'devopsprojectpratices'  // Set your ECR repository name
+        ECR_REPO_NAME = "${env.ECR_REPO_NAME}"   // Set your ECR repository name
         IMAGE_TAG = "${env.BUILD_ID}"  // Use the build ID as the image tag
         AWS_ACCESS_KEY_ID = credentials('awslogin')  // Reference AWS Access Key ID stored in Jenkins credentials
         AWS_SECRET_ACCESS_KEY = credentials('awslogin')  // Reference AWS Secret Access Key stored in Jenkins credentials
