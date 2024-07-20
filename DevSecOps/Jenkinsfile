@@ -16,7 +16,7 @@ pipeline {
         stage("SonarQube Analysis"){
             steps{
                withSonarQubeEnv("Sonar"){
-                   sh "$SONAR_HOME/bin/sonar-scanner -Dsonar.projectName=vulnerable-node -Dsonar.projectKey=vulnerable-node -X"
+                   sh "$SONAR_HOME/bin/sonar-scanner -Dsonar.projectName=node-Js-front_backend -Dsonar.projectKey=node-Js-front_backend -X"
                }
             }
         }
