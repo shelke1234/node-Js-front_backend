@@ -2,6 +2,6 @@ version: '3.9'
 
 services:
   web:
-    image: "dhananjay/node-app-batch-6:latest"
+    image: "${env.ECR_REPO_NAME}:${IMAGE_TAG}"
     ports:
       - "8000:8000"
