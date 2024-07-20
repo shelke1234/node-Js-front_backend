@@ -66,14 +66,14 @@ pipeline {
             }
         }
         
-        stage('Deploy') {
-            steps {
-                sh """
-                    docker-compose --env-file docker-compose.env down
-                    docker-compose --env-file docker-compose.env up -d
-                """
-                echo "App Deployed Successfully"
-            }
-        }
+        // stage('Deploy') {
+        //     steps {
+        //         sh """
+        //             docker-compose --env-file docker-compose.env down
+        //             docker-compose --env-file docker-compose.env up -d
+        //         """
+        //         echo "App Deployed Successfully"
+        //     }
+        // }
     }
 }
