@@ -35,7 +35,7 @@ pipeline {
         // }
         stage("Build & Test"){
             steps{
-                sh 'docker build -t node-app-batch-6:latest .'
+                sh 'aws ecr get-login-password --region ap-south-1 | docker login --username AWS --password-stdin 449368362816.dkr.ecr.ap-south-1.amazonaws.com'
                 echo "Code Built Successfully"
             }
         }
@@ -46,6 +46,9 @@ pipeline {
         // }
         stage("Push to Private Docker Hub Repo"){
             steps{
+                sh "docker build -t devopsprojectpratices ."
+                sh "docker tag devopsprojectpratices:latest 449368362816.dkr.ecr.ap-south-1.amazonaws.com/devopsprojectpratices:latest"
+                sh "docker push 449368362816.dkr.ecr.ap-south-1.amazonaws.com/devopsprojectpratices:latest"
                 sh "aws ecr get-login-password ${env.aceruser} -p ${env.acrpassword}"
                 sh "docker tag node-app-test-new:latest ${env.aceruser}/node-app-test-new:latest"
                 sh "docker push ${env.aceruser}/node-app-test-new:latest"
