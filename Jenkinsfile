@@ -15,6 +15,12 @@ pipeline {
                 script {
                     // Build Docker image
                     def dockerImage = docker.build("${env.ECR_REPO_NAME}:${IMAGE_TAG}", "./")
+                    // Scan Docker image using Trivy
+                    stage("Trivy"){
+                        steps{
+                            sh "trivy image ${ECR_REPO_NAME}:${IMAGE_TAG}"
+                        }
+                    }
                     
                     // Retrieve ECR login password
                     def ecrLogin = sh(script: "aws ecr get-login-password --region ${env.AWS_REGION}", returnStdout: true).trim()
