@@ -1,29 +1,37 @@
 pipeline {
-    agent any
-  environment {
+     agent { label ""}
+    
+    environment {
         SONAR_HOME = tool "Sonar"
         AWS_REGION = 'ap-south-1'  
         ECR_REPO_NAME = "${env.ECR_REPO_NAME}"  
         IMAGE_TAG = "${env.BUILD_ID}"  
         AWS_ACCOUNT_ID = credentials('awslogin')  
-  }
-
-    // parameters {
-    //     booleanParam(name: 'skip_test', defaultValue: false, description: 'Set to true to skip the test stage')
-    // }
-    stages{
-        stage("code") {
-            steps{
-                git branch: 'master', credentialsId: 'dhananjay-github', url: 'https://github.com/shelke1234/Configuring-CI-CD-on-Kubernetes-with-Jenkins.git'
+    }
+    
+    stages {
+        stage("Code") {
+            steps {
+                git branch: 'Dhananjay', credentialsId: 'dhananjay-github', url: 'https://github.com/LondheShubham153/node-todo-cicd.git'
                 echo "Code Cloned Successfully"
             }
         }
-        stage("SonarQube
+        
+        stage("SonarQube Analysis") {
+            steps {
                 withSonarQubeEnv("Sonar") {
-                    sh "$SONAR_HOME/bin/sonar-scanner -Dsonar.projectName=django-notes-app -Dsonar.projectKey=django-notes-app -X"
+                    sh "$SONAR_HOME/bin/sonar-scanner -Dsonar.projectName=node-Js-front_backend -Dsonar.projectKey=node-Js-front_backend -X"
                 }
             }
         }
+        
+        // stage("SonarQube Quality Gates") {
+        //     steps {
+        //         timeout(time: 1, unit: "MINUTES") {
+        //             waitForQualityGate abortPipeline: false
+        //         }
+        //     }
+        // }
         
         stage('Build and Push Docker Image') {
             steps {
@@ -57,24 +65,15 @@ pipeline {
                 }
             }
         }
-        stage("Docker remove Image") {
-            steps {
-                sh "docker rmi ${env.ECR_REPO_NAME}:${IMAGE_TAG}"
-            }
-        }
-        stage("Apply kubernetes Files"){
-            steps {
-                withkubeConfig([credentialsId: 'kubeconfig']) {
-                    sh 'cat deployment.yml | sed "s/{{IMAGE_TAG}/{{IMAGE_TAG}}/g" | kubectl apply -f -'
-                    sh 'kubectl apply -f service.yaml'
-                }
-            }
-        }
-        stage("Deploy"){
-            steps{
-                echo "Deploy to"
-            }
-        }
+        
+        // stage('Deploy') {
+        //     steps {
+        //         sh """
+        //             docker-compose --env-file docker-compose.env down
+        //             docker-compose --env-file docker-compose.env up -d
+        //         """
+        //         echo "App Deployed Successfully"
+        //     }
+        // }
     }
-
 }
