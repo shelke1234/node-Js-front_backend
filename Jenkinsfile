@@ -1,12 +1,12 @@
 pipeline {
-    agent { label "dev-server"}
+    agent { label "Tomcat server"}
     
     stages {
         
         stage("code"){
             steps{
-                git url: "https://github.com/LondheShubham153/node-todo-cicd.git", branch: "master"
-                echo 'bhaiyya code clone ho gaya'
+                git url: "https://github.com/shelke1234/node-Js-front_backend.git", branch: "master"
+                
             }
         }
         stage("build and test"){
